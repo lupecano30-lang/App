@@ -3,146 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KetoMaster | Recipe Guide</title>
+    <title>KetoMaster | The Green Plate</title>
     <style>
-        :root { --leaf: #22c55e; --egg: #facc15; --salmon: #fb7185; --bg: #f1f5f9; --dark: #0f172a; }
+        :root { --leaf: #16a34a; --egg: #facc15; --chicken: #ea580c; --bg: #f8fafc; --dark: #0f172a; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--dark); margin: 0; padding-bottom: 90px; }
         
-        /* App Structure */
-        .view { display: none; padding: 20px; animation: fadeIn 0.4s ease; }
-        .view.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .header { padding: 25px 20px; background: white; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 100; }
+        .search-bar { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #e2e8f0; box-sizing: border-box; font-size: 16px; margin-top: 10px; outline: none; }
+        .search-bar:focus { border-color: var(--leaf); }
 
-        /* Recipe Cards */
-        .recipe-list { margin-top: 20px; }
+        .recipe-list { padding: 15px; }
         .recipe-item { 
             display: flex; align-items: center; gap: 15px; background: white; 
             padding: 15px; border-radius: 18px; margin-bottom: 12px; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05); cursor: pointer;
-            transition: transform 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04); cursor: pointer;
         }
-        .recipe-item:active { transform: scale(0.98); }
-        .recipe-icon { width: 60px; height: 60px; background: #f8fafc; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+        .recipe-icon { width: 45px; height: 45px; background: #f1f5f9; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; }
 
-        /* Detail Overlay (Slide Up) */
-        #recipeOverlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); z-index: 2000; display: none;
-            align-items: flex-end;
-        }
-        .overlay-content {
-            background: white; width: 100%; max-height: 85vh;
-            border-radius: 30px 30px 0 0; padding: 30px;
-            box-sizing: border-box; overflow-y: auto;
-            animation: slideUp 0.3s ease-out;
-        }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        /* Detail Modal */
+        #recipeOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; display: none; align-items: flex-end; }
+        .overlay-content { background: white; width: 100%; max-height: 90vh; border-radius: 30px 30px 0 0; padding: 30px; box-sizing: border-box; overflow-y: auto; }
 
-        .close-btn { background: #eee; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; margin-bottom: 20px; }
-        .macro-tag { display: inline-block; padding: 4px 12px; border-radius: 10px; font-size: 12px; font-weight: bold; margin-right: 5px; }
-        
-        /* Bottom Nav */
+        .btn-action { width: 100%; padding: 16px; border-radius: 14px; border: none; background: var(--leaf); color: white; font-weight: bold; margin-top: 15px; cursor: pointer; }
+        .tag { display: inline-block; padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; background: #dcfce7; color: #166534; margin-right: 5px; }
+
         .nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: white; display: flex; border-top: 1px solid #e2e8f0; }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; color: #64748b; cursor: pointer; }
+        .nav-item { flex: 1; text-align: center; padding-top: 15px; font-size: 11px; color: #64748b; cursor: pointer; }
         .nav-item.active { color: var(--leaf); font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div id="v-recipes" class="view active">
-        <h2 style="margin-bottom: 5px;">Keto Kitchen</h2>
-        <p style="color: #64748b; font-size: 14px; margin-bottom: 25px;">Day 9: Anti-Inflammatory Meals</p>
-        
-        <div class="recipe-list">
-            <div class="recipe-item" onclick="openRecipe('eggs')">
-                <div class="recipe-icon">🍳</div>
-                <div><b>Day 9 Breakfast</b><br><small>Eggs, Salmon, Avocado</small></div>
-            </div>
-            <div class="recipe-item" onclick="openRecipe('steak')">
-                <div class="recipe-icon">🥩</div>
-                <div><b>Garlic Butter Ribeye</b><br><small>Zero carb power meal</small></div>
-            </div>
-            <div class="recipe-item" onclick="openRecipe('salad')">
-                <div class="recipe-icon">🥗</div>
-                <div><b>Avocado Cobb Salad</b><br><small>High fiber & fats</small></div>
-            </div>
-        </div>
+    <div class="header">
+        <h2 style="margin:0">Green Keto Library</h2>
+        <p style="margin:5px 0; font-size:14px; color:#64748b">High Protein • High Fiber • Zero Steak/Fish</p>
+        <input type="text" id="searchInput" class="search-bar" placeholder="Search (e.g. Broccoli, Spinach, Salad)" onkeyup="filterRecipes()">
     </div>
+
+    <div class="recipe-list" id="recipeContainer"></div>
 
     <div id="recipeOverlay" onclick="closeRecipe()">
         <div class="overlay-content" onclick="event.stopPropagation()">
-            <button class="close-btn" onclick="closeRecipe()">← Back</button>
-            <h2 id="r-title">Recipe Name</h2>
+            <div id="r-icon" style="font-size: 40px; margin-bottom: 10px;"></div>
+            <h2 id="r-title" style="margin-top:0"></h2>
+            <div id="r-tags" style="margin-bottom: 20px;"></div>
             
-            <div style="margin: 15px 0;">
-                <span class="macro-tag" style="background:#fef9c3; color:#a16207;">Fat: 72%</span>
-                <span class="macro-tag" style="background:#dcfce7; color:#15803d;">Net Carbs: 4g</span>
-            </div>
-
             <h3>Ingredients</h3>
             <ul id="r-ingredients" style="line-height: 1.8;"></ul>
-
-            <h3>Instructions</h3>
+            
+            <h3>Preparation</h3>
             <p id="r-steps" style="line-height: 1.6; color: #475569;"></p>
+            
+            <button class="btn-action" onclick="addToShop()">+ Add to Shopping List</button>
+            <button onclick="closeRecipe()" style="width:100%; padding:10px; background:none; border:none; color:#64748b; margin-top:10px;">Back to Recipes</button>
         </div>
     </div>
 
     <div class="nav">
-        <div class="nav-item">🏠<br>Home</div>
         <div class="nav-item active">🥗<br>Recipes</div>
-        <div class="nav-item">📊<br>Plan</div>
+        <div class="nav-item">🛒<br>Shop</div>
+        <div class="nav-item">📈<br>Weight</div>
     </div>
 
 <script>
-    const recipeData = {
-        eggs: {
-            title: "Day 9: Keto Breakfast Plate",
-            ingredients: [
-                "3 Large Organic Eggs",
-                "2oz Smoked Salmon (wild caught)",
-                "1/2 Ripe Avocado",
-                "1 tbsp Grass-fed Butter",
-                "Sea salt & Black pepper"
-            ],
-            steps: "1. Melt butter in a pan over medium-low heat. 2. Whisk eggs and pour into pan, stirring slowly for a soft scramble. 3. Slice avocado and plate next to smoked salmon. 4. Season with sea salt to replenish electrolytes lost during keto."
-        },
-        steak: {
-            title: "Garlic Butter Ribeye",
-            ingredients: [
-                "10oz Ribeye Steak",
-                "2 tbsp Salted Butter",
-                "2 cloves Garlic (crushed)",
-                "Fresh Rosemary"
-            ],
-            steps: "1. Pat steak dry and season heavily with salt. 2. Sear in a hot cast-iron skillet for 3 mins per side. 3. Add butter, garlic, and rosemary to the pan. 4. Spoon melted butter over steak for 2 mins."
-        },
-        salad: {
-            title: "Avocado Cobb Salad",
-            ingredients: [
-                "2 cups Romaine Lettuce",
-                "1 whole Avocado",
-                "2 slices Crispy Bacon",
-                "Hard-boiled Egg",
-                "Olive oil & Lemon dressing"
-            ],
-            steps: "1. Chop lettuce as the base. 2. Layer sliced avocado, crumbled bacon, and egg on top. 3. Drizzle generously with olive oil (healthy fats) and fresh lemon juice."
-        }
-    };
+    // The "Green" Generator Logic
+    const styles = ["Warm", "Zesty", "Garlic", "Crispy", "Steamed", "Herb", "Butter-Poached", "Chilled", "Spicy", "Roasted"];
+    const proteins = ["Grilled Chicken", "Shredded Chicken", "Omelette Style Eggs", "Poached Eggs", "Hard Boiled Eggs", "Soft Scrambled Eggs"];
+    const greens = ["Spinach", "Lettuce Mix", "Broccoli", "Mixed Greens", "Kale", "Zucchini Noodles", "Asparagus", "Cauliflower Rice"];
 
-    function openRecipe(key) {
-        const r = recipeData[key];
+    let allRecipes = [];
+
+    function generateRecipes() {
+        let id = 0;
+        styles.forEach(s => {
+            proteins.forEach(p => {
+                greens.forEach(g => {
+                    allRecipes.push({
+                        id: id++,
+                        title: `${s} ${p} over ${g}`,
+                        icon: p.includes("Chicken") ? "🍗" : "🍳",
+                        ing: [p, g, "Olive Oil", "Pink Himalayan Salt", "Cracked Pepper", "Garlic Powder"],
+                        steps: `Step 1: Prepare the ${p} to your liking. Step 2: Thoroughly wash and prep the ${g}. Step 3: Combine in a bowl and drizzle with olive oil for healthy fats. Step 4: Season with ${s.toLowerCase()} spices and enjoy your clean keto meal.`,
+                        tags: ["Fiber-Rich", "Cleanse", "No-Red-Meat"]
+                    });
+                });
+            });
+        });
+        renderRecipes(allRecipes);
+    }
+
+    function renderRecipes(list) {
+        const container = document.getElementById('recipeContainer');
+        container.innerHTML = list.map(r => `
+            <div class="recipe-item" onclick="openRecipe(${r.id})">
+                <div class="recipe-icon">${r.icon}</div>
+                <div><b>${r.title}</b><br><small style="color:var(--leaf)">${r.ing[1]}</small></div>
+            </div>
+        `).join('');
+    }
+
+    function filterRecipes() {
+        const term = document.getElementById('searchInput').value.toLowerCase();
+        const filtered = allRecipes.filter(r => r.title.toLowerCase().includes(term));
+        renderRecipes(filtered);
+    }
+
+    function openRecipe(id) {
+        const r = allRecipes.find(item => item.id === id);
         document.getElementById('r-title').innerText = r.title;
+        document.getElementById('r-icon').innerText = r.icon;
+        document.getElementById('r-ingredients').innerHTML = r.ing.map(i => `<li>${i}</li>`).join('');
         document.getElementById('r-steps').innerText = r.steps;
-        
-        const ingList = document.getElementById('r-ingredients');
-        ingList.innerHTML = r.ingredients.map(i => `<li>${i}</li>`).join('');
-        
+        document.getElementById('r-tags').innerHTML = r.tags.map(t => `<span class="tag">${t}</span>`).join('');
         document.getElementById('recipeOverlay').style.display = 'flex';
     }
 
     function closeRecipe() {
         document.getElementById('recipeOverlay').style.display = 'none';
     }
+
+    function addToShop() {
+        alert("Added to your shopping list!");
+        closeRecipe();
+    }
+
+    generateRecipes();
 </script>
 </body>
 </html>
