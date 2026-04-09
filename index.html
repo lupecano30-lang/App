@@ -1,144 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
-<
-    <div id="v-progress" class="view">
-        <h2>Session Results</h2>
-        <div style="background:var(--card); padding:20px; border-radius:20px; margin-top:20px">
-            <div style="display:flex; justify-content:space-between"><span>Overall</span> <b>70</b></div>
-            <div class="progress-container"><div class="progress-fill" style="width:70%"></div></div>
-            
-            <div style="display:flex; justify-content:space-between; margin-top:20px"><span>3-Bet Spots</span> <b>100</b></div>
-            <div class="progress-container"><div class="progress-fill" style="width:100%"></div></div>
-            
-            <div style="display:flex; justify-content:space-between; margin-top:20px"><span>Short Stack</span> <b>80</b></div>
-            <div class="progress-container"><div class="progress-fill" style="width:80%"></div></div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KetoMaster | 11-Day Cleanse</title>
+    <style>
+        :root { --leaf: #22c55e; --egg: #facc15; --salmon: #fb7185; --bg: #f8fafc; --dark: #0f172a; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--dark); margin: 0; padding-bottom: 90px; }
+        
+        /* Navigation */
+        .nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: white; display: flex; border-top: 1px solid #e2e8f0; z-index: 1000; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; cursor: pointer; color: #64748b; }
+        .nav-item.active { color: var(--leaf); font-weight: bold; }
+
+        .view { display: none; padding: 20px; animation: fadeIn 0.4s ease; }
+        .view.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Dashboard Header */
+        .day-circle { width: 80px; height: 80px; border: 5px solid var(--leaf); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 800; margin: 0 auto 20px; background: white; }
+        
+        /* Macro Card */
+        .card { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .macro-bar { height: 8px; border-radius: 4px; background: #e2e8f0; margin: 8px 0 15px; overflow: hidden; }
+        .fill { height: 100%; transition: 1s ease-in-out; }
+
+        /* Recipe List */
+        .recipe-card { display: flex; gap: 15px; background: white; padding: 10px; border-radius: 15px; margin-bottom: 15px; align-items: center; border: 1px solid #e2e8f0; }
+        .recipe-img { width: 70px; height: 70px; background: #ddd; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 30px; }
+    </style>
+</head>
+<body>
+
+    <div id="v-dash" class="view active">
+        <h2 style="text-align:center">Cleanse Progress</h2>
+        <div class="day-circle">9<span style="font-size:12px">/11</span></div>
+        
+        <div class="card">
+            <h3>Daily Macros</h3>
+            <div><span>Fat (70%)</span><div class="macro-bar"><div class="fill" style="width:70%; background:var(--egg)"></div></div></div>
+            <div><span>Protein (25%)</span><div class="macro-bar"><div class="fill" style="width:25%; background:var(--salmon)"></div></div></div>
+            <div><span>Carbs (5%)</span><div class="macro-bar"><div class="fill" style="width:5%; background:var(--leaf)"></div></div></div>
+        </div>
+
+        <h3>Tasks Today</h3>
+        <div class="card">
+            <label><input type="checkbox" checked> 2L Water Intake</label><br><br>
+            <label><input type="checkbox" checked> Morning Scrambled Eggs</label><br><br>
+            <label><input type="checkbox"> 20min Light Walk</label>
         </div>
     </div>
 
-    <div class="bottom-nav">
-        <div class="nav-btn active" onclick="nav('v-study', this)"><span class="nav-icon">📖</span>Study</div>
-        <div class="nav-btn" onclick="nav('v-trainer', this)"><span class="nav-icon">🎮</span>Trainer</div>
-        <div class="nav-btn" onclick="nav('v-charts', this)"><span class="nav-icon">📉</span>Charts</div>
-        <div class="nav-btn" onclick="nav('v-progress', this)"><span class="nav-icon">🏆</span>Progress</div>
+    <div id="v-recipes" class="view">
+        <h2>Keto Recipes</h2>
+        <div class="recipe-card">
+            <div class="recipe-img">🍳</div>
+            <div><b>Classic Keto Breakfast</b><br><small>Eggs, Salmon, Avocado</small></div>
+        </div>
+        <div class="recipe-card">
+            <div class="recipe-img">🥩</div>
+            <div><b>Ribeye & Asparagus</b><br><small>High fat, zero carb</small></div>
+        </div>
+        <div class="recipe-card">
+            <div class="recipe-img">🥗</div>
+            <div><b>Caesar Salad (No Croutons)</b><br><small>Grilled chicken & parm</small></div>
+        </div>
+    </div>
+
+    <div id="v-track" class="view">
+        <h2>Weight Tracker</h2>
+        <div class="card" style="text-align:center">
+            <p>Current Loss</p>
+            <h1 style="color:var(--leaf); margin:0">-12.4 lbs</h1>
+            <p style="font-size:12px; color:#64748b">Goal: -18 lbs</p>
+        </div>
+        <canvas id="weightChart" style="width:100%; height:200px; background:#eee; border-radius:10px"></canvas>
+    </div>
+
+    <div class="nav">
+        <div class="nav-item active" onclick="nav('v-dash', this)">🏠<br>Home</div>
+        <div class="nav-item" onclick="nav('v-recipes', this)">🥗<br>Recipes</div>
+        <div class="nav-item" onclick="nav('v-track', this)">📈<br>Tracker</div>
     </div>
 
 <script>
     function nav(id, el) {
         document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         document.getElementById(id).classList.add('active');
         el.classList.add('active');
     }
-
-    // Grid Builder
-    const ranks = ['A','K','Q','J','T','9','8','7','6','5','4','3','2'];
-    function makeGrid(target) {
-        const g = document.getElementById(target);
-        for(let i=0; i<13; i++) {
-            for(let j=0; j< }
-    }
-    makeGrid('studyGrid');
-    makeGrid('chartGrid');
-
-    function play(move) {
-        const f = document.getElementById('feedback');
-        if(move === 'CALL') {
-            f.innerText = "CORRECT GTO PLAY"; f.style.color = "var(--win)";
-        } else {
-            f.innerText = "MISTAKE - CALL WAS 73%"; f.style.color = "#ef4444";
-        }
-        setTimeout(() => { f.innerText = "Next hand dealing..."; f.style.color = "white"; }, 1500);
-    }
-    {
-  "name": "preflop-trainer",
-  "version": "2.0.0",
-  "main": "node_modules/expo/AppEntry.js",
-  "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios"
-  },
-  "dependencies": {
-    "expo": "~51.0.0",
-    "react": "18.2.0",
-    "react-native": "0.74.5",
-    "@react-navigation/native": "^6.1.18",
-    "@react-navigation/bottom-tabs": "^6.6.1",
-    "@react-navigation/native-stack": "^6.11.0",
-    "react-native-safe-area-context": "4.10.5",
-    "react-native-screens": "3.31.1",
-    "expo-status-bar": "~1.12.1",
-    "react-native-picker-select": "^9.1.3"
-  }
-}
-    import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { StatusBar } from 'expo-status-bar';
-import RangeViewer from './screens/RangeViewer';
-import QuizMode from './screens/QuizMode';
-import DrillMode from './screens/DrillMode';
-import Stats from './screens/Stats';
-
-const Tab = createBottomTabNavigator();
-
-export default function App() {
-  return (
-    <NavigationContainer>
-      <StatusBar style="light" />
-      <Tab.Navigator
-        screenOptions={{
-          headerStyle: { backgroundColor: '#0a0a0a' },
-          headerTintColor: '#fff',
-          tabBarStyle: { backgroundColor: '#0a0a0a', borderTopColor: '#1f1f1f' },
-          tabBarActiveTintColor: '#4ade80',
-          tabBarInactiveTintColor: '#6b7280'
-        }}
-      >
-        <Tab.Screen name="Ranges" component={RangeViewer} />
-        <Tab.Screen name="Quiz" component={QuizMode} />
-        <Tab.Screen name="Drill" component={DrillMode} />
-        <Tab.Screen name="Stats" component={Stats} />
-      </Tab.Navigator>
-    </NavigationContainer>
-  );
-}
-    import utg from '../data/utg_rfi.json';
-import hj from '../data/hj_rfi.json';
-import co from '../data/co_rfi.json';
-import btn from '../data/btn_rfi.json';
-import bb from '../data/bb_vs_btn.json';
-
-export const RANGES = {
-  'UTG_RFI': utg,
-  'HJ_RFI': hj,
-  'CO_RFI': co,
-  'BTN_RFI': btn,
-  'BB_VS_BTN': bb
-};
-
-export const SPOTS = [
-  { label: 'UTG RFI', value: 'UTG_RFI' },
-  { label: 'HJ RFI', value: 'HJ_RFI' },
-  { label: 'CO RFI', value: 'CO_RFI' },
-  { label: 'BTN RFI', value: 'BTN_RFI' },
-  { label: 'BB vs BTN', value: 'BB_VS_BTN' }
-];
-
-export const HANDS = [
-  ['AA','AKs','AQs','AJs','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s'],
-  ['AKo','KK','KQs','KJs','KTs','K9s','K8s','K7s','K6s','K5s','K4s','K3s','K2s'],
-  ['AQo','KQo','QQ','QJs','QTs','Q9s','Q8s','Q7s','Q6s','Q5s','Q4s','Q3s','Q2s'],
-  ['AJo','KJo','QJo','JJ','JTs','J9s','J8s','J7s','J6s','J5s','J4s','J3s','J2s'],
-  ['ATo','KTo','QTo','JTo','TT','T9s','T8s','T7s','T6s','T5s','T4s','T3s','T2s'],
-  ['A9o','K9o','Q9o','J9o','T9o','99','98s','97s','96s','95s','94s','93s','92s'],
-  ['A8o','K8o','Q8o','J8o','T8o','98o','88','87s','86s','85s','84s','83s','82s'],
-  ['A7o','K7o','Q7o','J7o','T7o','97o','87o','77','76s','75s','74s','73s','72s'],
-  ['A6o','K6o','Q6o','J6o','T6o','96o','86o','76o','66','65s','64s','63s','62s'],
-  ['A5o','K5o','Q5o','J5o','T5o','95o','85o','75o','65o','55','54s','53s','52s'],
-  ['A4o','K4o','Q4o','J4o','T4o','94o','84o','74o','64o','54o','44','43s','42s'],
-  ['A3o','K3o','Q3o','J3o','T3o','93o','83o','73o','63o','53o','43o','33','32s'],
-  ['A2o','K2o','Q2o','J2o','T2o','92o','82o','72o','62o','52o','42o','32o','22'],
-];
 </script>
 </body>
 </html>
