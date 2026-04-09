@@ -3,207 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Serene | Mental Wellness</title>
+    <title>Preflop Pro | GTO Ranges</title>
     <style>
         :root {
-            --glass: rgba(255, 255, 255, 0.2);
-            --text: #1e272e;
-            --accent: #74b9ff;
+            --bg: #1a1a1a;
+            --card-bg: #2d2d2d;
+            --raise: #eb4d4b;
+            --fold: #636e72;
+            --text: #ffffff;
         }
-
         body {
-            margin: 0;
-            font-family: 'Inter', -apple-system, sans-serif;
-            background: linear-gradient(-45deg, #a8c0ff, #fbc2eb, #a18cd1, #fad0c4);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-        }
-
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        .glass-card {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 30px;
-            width: 90%;
-            max-width: 400px;
-            height: 600px;
+            font-family: -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
             display: flex;
             flex-direction: column;
+            align-items: center;
+            margin: 0;
             padding: 20px;
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
-            position: relative;
         }
-
-        nav {
-            display: flex;
-            justify-content: space-around;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 10px;
+        .controls {
             margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
         }
-
-        .nav-link {
-            cursor: pointer;
-            padding: 8px 15px;
-            border-radius: 12px;
-            transition: 0.3s;
-            font-weight: 500;
+        select {
+            padding: 10px;
+            background: var(--card-bg);
             color: white;
-            font-size: 0.9rem;
+            border: 1px solid #444;
+            border-radius: 8px;
         }
-
-        .nav-link.active { background: white; color: var(--text); }
-
-        .view { display: none; flex-grow: 1; color: white; animation: fadeIn 0.5s; }
-        .view.active { display: flex; flex-direction: column; align-items: center; justify-content: center; }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* Breathing Tool */
-        .breath-ring {
-            width: 150px; height: 150px;
-            border: 8px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            transition: transform 4s ease-in-out;
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(13, 1fr);
+            gap: 2px;
+            width: 95vw;
+            max-width: 600px;
+            aspect-ratio: 1;
         }
-        .expand { transform: scale(1.6); border-color: white; }
-
-        /* Journal Tool */
-        textarea {
-            width: 100%; height: 150px;
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.3);
-            border-radius: 15px;
-            color: white;
-            padding: 15px;
-            box-sizing: border-box;
-            outline: none;
-            font-size: 1rem;
+        .cell {
+            background: var(--fold);
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            border-radius: 2px;
+            cursor: default;
         }
-
-        .action-btn {
-            background: white; color: var(--text);
-            border: none; padding: 12px 30px;
-            border-radius: 25px; margin-top: 20px;
-            font-weight: bold; cursor: pointer;
-            transition: 0.3s;
+        .cell.raise { background: var(--raise); }
+        .cell.pair { border: 1px solid rgba(255,255,255,0.3); }
+        
+        .legend {
+            margin-top: 20px;
+            display: flex;
+            gap: 20px;
         }
-        .action-btn:hover { transform: scale(1.05); }
-
-        .safety { font-size: 0.7rem; opacity: 0.8; margin-top: auto; padding: 10px; }
+        .legend-item { display: flex; align-items: center; gap: 5px; font-size: 14px; }
+        .color-box { width: 15px; height: 15px; border-radius: 3px; }
     </style>
 </head>
 <body>
 
-<div class="glass-card">
-    <nav>
-        <div class="nav-link active" onclick="switchTab('calm', this)">Calm</div>
-        <div class="nav-link" onclick="switchTab('reflect', this)">Reflect</div>
-        <div class="nav-link" onclick="switchTab('focus', this)">Focus</div>
-    </nav>
-
-    <div id="calm" class="view active">
-        <div id="ring" class="breath-ring">Hold</div>
-        <h2 id="b-text" style="margin-top: 40px;">Ready?</h2>
-        <button class="action-btn" onclick="startSession()">Begin Breathing</button>
+    <h2>Preflop Wizard Lite</h2>
+    
+    <div class="controls">
+        <label>Position: </label>
+        <select id="positionSelect" onchange="updateRange()">
+            <option value="UTG">UTG (Under the Gun)</option>
+            <option value="BTN">BTN (Button)</option>
+            <option value="SB">SB (Small Blind)</option>
+        </select>
     </div>
 
-    <div id="reflect" class="view">
-        <h2>Release Your Thoughts</h2>
-        <textarea id="journalInput" placeholder="What's on your mind?"></textarea>
-        <div id="affirmationBox" style="margin-top: 20px; font-style: italic; min-height: 50px;"></div>
-        <button class="action-btn" onclick="generateResponse()">Reflect</button>
-    </div>
+    <div class="grid" id="pokerGrid"></div>
 
-    <div id="focus" class="view">
-        <h2 id="stepNum">5</h2>
-        <p id="stepText">Things you can see</p>
-        <button class="action-btn" onclick="nextFocus()">Got it</button>
+    <div class="legend">
+        <div class="legend-item"><div class="color-box" style="background:var(--raise)"></div> Raise (RFI)</div>
+        <div class="legend-item"><div class="color-box" style="background:var(--fold)"></div> Fold</div>
     </div>
-
-    <div class="safety">
-        Emergency: Call 988. This is a support tool, not medical advice.
-    </div>
-</div>
 
 <script>
-    // Tab System
-    function switchTab(id, el) {
-        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-        document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        el.classList.add('active');
-    }
+    const ranks = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'];
+    const grid = document.getElementById('pokerGrid');
 
-    // Pro Breathing Logic
-    function startSession() {
-        const ring = document.getElementById('ring');
-        const text = document.getElementById('b-text');
-        const cycle = () => {
-            text.innerText = "Inhale"; ring.classList.add('expand');
-            setTimeout(() => {
-                text.innerText = "Hold";
-                setTimeout(() => {
-                    text.innerText = "Exhale"; ring.classList.remove('expand');
-                    setTimeout(cycle, 4000);
-                }, 2000);
-            }, 4000);
-        };
-        cycle();
-    }
+    // Simplified GTO Opening Ranges (Raise First In)
+    const ranges = {
+        UTG: ['AA', 'KK', 'QQ', 'JJ', 'TT', '99', '88', '77', 'AKs', 'AQs', 'AJs', 'ATs', 'AKo', 'AQo', 'KQs'],
+        BTN: ['AA', 'KK', 'QQ', 'JJ', 'TT', '99', '88', '77', '66', '55', '44', '33', '22', 'AKs', 'AQs', 'AJs', 'ATs', 'A9s', 'A8s', 'A7s', 'A5s', 'KQs', 'KJs', 'KTs', 'K9s', 'QJs', 'QTs', 'JTs', 'T9s', '98s', 'AKo', 'AQo', 'AJo', 'ATo', 'KQo', 'KJo'],
+        SB: ['AA', 'KK', 'QQ', 'JJ', 'TT', '99', '88', '77', '66', '55', 'AKs', 'AQs', 'AJs', 'ATs', 'A2s', 'KQs', 'AKo', 'AQo']
+    };
 
-    // Reflect Logic
-    const quotes = [
-        "You've survived 100% of your hardest days.",
-        "This feeling is a tunnel, not a cave. You are moving through it.",
-        "You are not your thoughts; you are the one observing them.",
-        "It's okay to be a 'work in progress.'"
-    ];
-    function generateResponse() {
-        const input = document.getElementById('journalInput').value;
-        const box = document.getElementById('affirmationBox');
-        if(input.length < 5) {
-            box.innerText = "Write a little more, then let it go.";
-            return;
-        }
-        box.innerText = "Thank you for sharing. Remember: " + quotes[Math.floor(Math.random() * quotes.length)];
-        document.getElementById('journalInput').value = "";
-    }
+    function drawGrid() {
+        grid.innerHTML = '';
+        const currentPos = document.getElementById('positionSelect').value;
+        const currentRange = ranges[currentPos];
 
-    // Focus Logic
-    let focusI = 0;
-    const focusSteps = [
-        {n: 5, t: "Things you can see"},
-        {n: 4, t: "Things you can touch"},
-        {n: 3, t: "Things you can hear"},
-        {n: 2, t: "Things you can smell"},
-        {n: 1, t: "Thing you can taste"}
-    ];
-    function nextFocus() {
-        focusI++;
-        if(focusI < focusSteps.length) {
-            document.getElementById('stepNum').innerText = focusSteps[focusI].n;
-            document.getElementById('stepText').innerText = focusSteps[focusI].t;
-        } else {
-            document.getElementById('stepNum').innerText = "Done";
-            document.getElementById('stepText').innerText = "You are grounded and safe.";
+        for (let i = 0; i < 13; i++) {
+            for (let j = 0; j < 13; j++) {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                
+                let hand = '';
+                if (i < j) {
+                    hand = ranks[i] + ranks[j] + 's'; // Suited
+                } else if (i > j) {
+                    hand = ranks[j] + ranks[i] + 'o'; // Offsuit
+                } else {
+                    hand = ranks[i] + ranks[j]; // Pairs
+                    cell.classList.add('pair');
+                }
+
+                cell.innerText = hand;
+                if (currentRange.includes(hand)) {
+                    cell.classList.add('raise');
+                }
+                grid.appendChild(cell);
+            }
         }
     }
+
+    function updateRange() {
+        drawGrid();
+    }
+
+    drawGrid();
 </script>
-
 </body>
 </html>
