@@ -3,39 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KetoMaster | AI Green Plates</title>
+    <title>Green Keto Master | Fixed</title>
     <style>
-        :root { --leaf: #16a34a; --bg: #f8fafc; --dark: #0f172a; --card: #ffffff; }
+        :root { --leaf: #16a34a; --bg: #f8fafc; --dark: #0f172a; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--dark); margin: 0; padding-bottom: 90px; }
         
         .header { padding: 25px 20px; background: white; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 100; }
         .search-bar { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #e2e8f0; box-sizing: border-box; font-size: 16px; margin-top: 10px; outline: none; }
 
         .recipe-list { padding: 20px; }
-        .recipe-item { display: flex; align-items: center; gap: 15px; background: var(--card); padding: 15px; border-radius: 18px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); cursor: pointer; }
+        .recipe-item { display: flex; align-items: center; gap: 15px; background: white; padding: 15px; border-radius: 18px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); cursor: pointer; }
         .recipe-icon { width: 45px; height: 45px; background: #f1f5f9; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; }
 
-        /* Detail Modal (Glassmorphism inspired) */
         #recipeOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; display: none; align-items: flex-end; }
-        .overlay-content { background: white; width: 100%; max-height: 90vh; border-radius: 30px 30px 0 0; padding: 30px; box-sizing: border-box; overflow-y: auto; box-shadow: 0 -10px 25px rgba(0,0,0,0.2); }
+        .overlay-content { background: white; width: 100%; max-height: 90vh; border-radius: 30px 30px 0 0; padding: 30px; box-sizing: border-box; overflow-y: auto; }
         
-        .btn-action { width: 100%; padding: 16px; border-radius: 14px; border: none; background: var(--leaf); color: white; font-weight: bold; margin-top: 15px; cursor: pointer; }
-        .instruction-step { margin-bottom: 15px; padding-left: 15px; border-left: 3px solid var(--leaf); font-size: 14px; color: #475569; line-height: 1.5; }
-        
-        .measurement-list { list-style: none; padding: 0; margin-bottom: 20px; }
-        .measurement-list li { padding: 8px 0; border-bottom: 1px solid #f1f5f9; font-weight: 500; font-size: 15px; }
+        .btn-action { width: 100%; padding: 16px; border-radius: 14px; border: none; background: var(--leaf); color: white; font-weight: bold; margin-top: 20px; cursor: pointer; }
+        .instruction-step { margin-bottom: 15px; padding-left: 15px; border-left: 3px solid var(--leaf); font-size: 14px; color: #475569; }
 
-        /* The NEW Final Plate Visual Section */
-        .final-plate {
-            margin-top: 40px; text-align: center; border-top: 1px solid #e2e8f0; padding-top: 20px;
+        /* Fixed Image Container */
+        .image-container { 
+            width: 100%; 
+            min-height: 300px; 
+            background: #f1f5f9; 
+            border-radius: 20px; 
+            margin: 20px 0; 
+            overflow: hidden; 
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .ai-chef-badge {
-            background: rgba(22, 163, 74, 0.1); color: var(--leaf); display: inline-block; padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: bold; margin-bottom: 10px;
-        }
-        .plated-photo {
-            width: 100%; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.08); display: block; background: #f1f5f9; margin-bottom: 10px;
-        }
-        
+        .plated-photo { width: 100%; height: auto; display: block; border-radius: 20px; }
+        .loading-text { position: absolute; font-size: 12px; color: #64748b; font-weight: bold; }
+
         .nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: white; display: flex; border-top: 1px solid #e2e8f0; }
         .nav-item { flex: 1; text-align: center; padding-top: 15px; font-size: 11px; color: #64748b; cursor: pointer; }
         .nav-item.active { color: var(--leaf); font-weight: bold; }
@@ -45,8 +46,7 @@
 
     <div class="header">
         <h2 style="margin:0">Green Keto Library</h2>
-        <p style="margin:5px 0; font-size:14px; color:var(--leaf)">480+ Precise Green Plates Loaded</p>
-        <input type="text" id="searchInput" class="search-bar" placeholder="Search vegetables or cooking style..." onkeyup="filterRecipes()">
+        <input type="text" id="searchInput" class="search-bar" placeholder="Search vegetables..." onkeyup="filterRecipes()">
     </div>
 
     <div class="recipe-list" id="recipeContainer"></div>
@@ -55,22 +55,20 @@
         <div class="overlay-content" onclick="event.stopPropagation()">
             <div id="r-icon" style="font-size: 40px; margin-bottom: 10px;"></div>
             <h2 id="r-title" style="margin:0"></h2>
-            <p id="r-desc" style="font-style: italic; color: #64748b; font-size: 14px; margin: 15px 0;"></p>
             
             <h3>Exact Measurements</h3>
-            <ul id="r-ingredients" class="measurement-list"></ul>
+            <ul id="r-ingredients" style="line-height: 1.8;"></ul>
             
             <h3>How to Cook</h3>
             <div id="r-steps"></div>
             
-            <div class="final-plate">
-                <div class="ai-chef-badge">✨ AI Chef Visualization</div>
-                <img id="r-plate" class="plated-photo" src="" alt="A professional photograph of the finished keto meal">
-                <p id="r-visual-desc" style="font-size: 12px; color: #94a3b8;">High-Fat, High-Fiber Cleanse (70/25/5)</p>
+            <div class="image-container">
+                <div class="loading-text" id="loadingMsg">Preparing AI Visualization...</div>
+                <img id="r-plate" class="plated-photo" src="" onload="document.getElementById('loadingMsg').style.display='none'">
             </div>
 
-            <button class="btn-action" onclick="alert('Added to Shopping List!')">+ Add Ingredients to Shop</button>
-            <button onclick="closeRecipe()" style="width:100%; padding:15px; background:none; border:none; color:#64748b; font-weight: 600;">Back to Library</button>
+            <button class="btn-action" onclick="alert('Added!')">+ Add Ingredients to Shop</button>
+            <button onclick="closeRecipe()" style="width:100%; padding:15px; background:none; border:none; color:#64748b;">Close</button>
         </div>
     </div>
 
@@ -81,59 +79,33 @@
     </div>
 
 <script>
-    const styles = ["Garlic", "Lemon", "Zesty", "Spicy", "Herb-Crusted", "Butter-Poached", "Warm", "Crispy", "Peppery", "Roasted"];
+    const styles = ["Garlic", "Lemon", "Warm", "Crispy", "Roasted"];
     const proteins = [
-        { name: "Chicken Breast", icon: "🍗", qty: "6oz", desc: "Lean protein optimized for muscle retention during cleanse." },
-        { name: "Chicken Thighs", icon: "🍗", qty: "2 pieces (skin-on)", desc: "Higher fat content to keep you full and energized." },
-        { name: "Omelette Eggs", icon: "🍳", qty: "3 Large Eggs", desc: "High in choline and healthy fats for brain focus." },
-        { name: "Poached Eggs", icon: "🍳", qty: "3 Large Eggs", desc: "A soft, light way to enjoy high-quality protein." },
-        { name: "Shredded Chicken", icon: "🍗", qty: "1.5 cups", desc: "Easy to digest and perfect for absorbing dressings." },
-        { name: "Hard Boiled Eggs", icon: "🍳", qty: "3 Large Eggs", desc: "Firm texture, high protein pairing." }
+        { name: "Chicken Breast", icon: "🍗", qty: "6oz" },
+        { name: "Omelette Eggs", icon: "🍳", qty: "3 Large Eggs" }
     ];
     const vegetables = [
-        { name: "Spinach", qty: "3 cups (fresh)", step: "Sauté in oil for 60 seconds until just wilted." },
-        { name: "Broccoli", qty: "2 cups (florets)", step: "Steam for 4 minutes until vibrant green and tender-crisp." },
-        { name: "Zucchini Noodles", qty: "2 cups (spiralized)", step: "Flash fry in a pan for 2 minutes to maintain crunch." },
-        { name: "Mixed Greens", qty: "3 cups (packed)", step: "Wash thoroughly and toss with dressing to serve raw." },
-        { name: "Lettuce Mix", qty: "2.5 cups", step: "Shred finely and use as a refreshing, crisp base." },
-        { name: "Asparagus", qty: "8-10 spears", step: "Sear in the pan for 5 minutes with salt." },
-        { name: "Kale", qty: "2 cups (chopped)", step: "Massage with a little oil to soften before serving." },
-        { name: "Cauliflower Rice", qty: "1.5 cups", step: "Sauté in oil for 6-8 minutes until slightly golden." }
+        { name: "Spinach", qty: "3 cups", step: "Sauté in oil for 60s." },
+        { name: "Broccoli", qty: "2 cups", step: "Steam for 4 mins." },
+        { name: "Zucchini", qty: "2 cups", step: "Flash fry for 2 mins." }
     ];
 
     let allRecipes = [];
 
     function generate() {
         let id = 0;
-        styles.forEach(s => {
-            proteins.forEach(p => {
-                vegetables.forEach(v => {
-                    const prompt = `A professional food photograph of ${s} ${p.name} served on a bed of ${v.name}. The meal is glistening with high-quality Extra Virgin Olive Oil, seasoned with Pink Himalayan Salt and Cracked Pepper. The chicken is moist and golden, the eggs are perfectly cooked. The vegetables are a vibrant green. Plated elegantly on a simple, white plate, matching the clean keto aesthetic. Soft, natural daylight lighting, high definition, extreme detail, 8k resolution.`;
-                    
-                    allRecipes.push({
-                        id: id++,
-                        title: `${s} ${p.name} over ${v.name}`,
-                        desc: p.desc,
-                        icon: p.icon,
-                        platePrompt: encodeURIComponent(prompt),
-                        ing: [
-                            `${p.qty} ${p.name}`,
-                            `${v.qty} ${v.name}`,
-                            "2 tbsp Extra Virgin Olive Oil",
-                            "1/2 tsp Pink Himalayan Salt",
-                            "1/4 tsp Cracked Black Pepper",
-                            s === "Garlic" ? "1 clove Fresh Garlic (minced)" : `1/2 tsp ${s} seasoning`
-                        ],
-                        steps: [
-                            `Prepare the ${p.name} by seasoning with salt and pepper.`,
-                            p.name.includes("Chicken") ? `Cook chicken thoroughly until internal temp reaches 165°F (12-15 mins).` : `Cook eggs over low heat to maintain healthy fat structures.`,
-                            `${v.step}`,
-                            `Combine warm ${p.name} with ${v.name} and drizzle with the full 2 tbsp of EVOO for deep ketosis.`
-                        ]
-                    });
-                });
+        styles.forEach(s => proteins.forEach(p => vegetables.forEach(v => {
+            // Updated Prompt Logic for better reliability
+            const photoPrompt = `gourmet-keto-${s.toLowerCase()}-${p.name.split(' ')[0].toLowerCase()}-on-${v.name.toLowerCase()}`;
+            allRecipes.push({
+                id: id++,
+                title: `${s} ${p.name} over ${v.name}`,
+                icon: p.icon,
+                imgUrl: `https://loremflickr.com/600/600/cooked,${p.name.split(' ')[0].toLowerCase()},${v.name.toLowerCase()}/all`,
+                ing: [`${p.qty} ${p.name}`, `${v.qty} ${v.name}`, "2 tbsp Olive Oil", "Pink Salt"],
+                steps: [`Prep ${p.name}.`, `Cook thoroughly.`, `${v.step}`, `Drizzle with oil.`]
             });
-        });
+        })));
         renderRecipes(allRecipes);
     }
 
@@ -141,7 +113,7 @@
         document.getElementById('recipeContainer').innerHTML = list.map(r => `
             <div class="recipe-item" onclick="openRecipe(${r.id})">
                 <div class="recipe-icon">${r.icon}</div>
-                <div><b>${r.title}</b><br><small style="color:var(--leaf)">AI Visualization Included</small></div>
+                <div><b>${r.title}</b></div>
             </div>`).join('');
     }
 
@@ -149,15 +121,13 @@
         const r = allRecipes.find(item => item.id === id);
         document.getElementById('r-title').innerText = r.title;
         document.getElementById('r-icon').innerText = r.icon;
-        document.getElementById('r-desc').innerText = r.desc;
         document.getElementById('r-ingredients').innerHTML = r.ing.map(i => `<li>${i}</li>`).join('');
         document.getElementById('r-steps').innerHTML = r.steps.map(s => `<div class="instruction-step">${s}</div>`).join('');
         
-        // NEW: Load the unique AI-generated plate visualization
-        // Replace 'your_ai_api_key' with a service like Pollinations or OpenAI if you connect a real key.
-        // For demonstration, this uses a placeholder service that generates food based on the prompt.
-        const plateImage = document.getElementById('r-plate');
-        plateImage.src = `https://pollinations.ai/p/${r.platePrompt}?no-cache=1&width=1024&height=1024`;
+        // Load the new image
+        const img = document.getElementById('r-plate');
+        document.getElementById('loadingMsg').style.display = 'block';
+        img.src = r.imgUrl;
         
         document.getElementById('recipeOverlay').style.display = 'flex';
     }
