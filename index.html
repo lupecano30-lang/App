@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Green Keto Master | Fixed</title>
+    <title>Green Keto Master | Simplified</title>
     <style>
         :root { --leaf: #16a34a; --bg: #f8fafc; --dark: #0f172a; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--dark); margin: 0; padding-bottom: 90px; }
@@ -19,23 +19,20 @@
         .overlay-content { background: white; width: 100%; max-height: 90vh; border-radius: 30px 30px 0 0; padding: 30px; box-sizing: border-box; overflow-y: auto; }
         
         .btn-action { width: 100%; padding: 16px; border-radius: 14px; border: none; background: var(--leaf); color: white; font-weight: bold; margin-top: 20px; cursor: pointer; }
-        .instruction-step { margin-bottom: 15px; padding-left: 15px; border-left: 3px solid var(--leaf); font-size: 14px; color: #475569; }
-
-        /* Fixed Image Container */
+        
+        /* Photo Styling */
         .image-container { 
             width: 100%; 
-            min-height: 300px; 
+            min-height: 350px; 
             background: #f1f5f9; 
             border-radius: 20px; 
             margin: 20px 0; 
             overflow: hidden; 
-            position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        .plated-photo { width: 100%; height: auto; display: block; border-radius: 20px; }
-        .loading-text { position: absolute; font-size: 12px; color: #64748b; font-weight: bold; }
+        .plated-photo { width: 100%; height: 100%; object-fit: cover; display: block; }
 
         .nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: white; display: flex; border-top: 1px solid #e2e8f0; }
         .nav-item { flex: 1; text-align: center; padding-top: 15px; font-size: 11px; color: #64748b; cursor: pointer; }
@@ -46,7 +43,7 @@
 
     <div class="header">
         <h2 style="margin:0">Green Keto Library</h2>
-        <input type="text" id="searchInput" class="search-bar" placeholder="Search vegetables..." onkeyup="filterRecipes()">
+        <input type="text" id="searchInput" class="search-bar" placeholder="Search (Chicken, Egg, Spinach...)" onkeyup="filterRecipes()">
     </div>
 
     <div class="recipe-list" id="recipeContainer"></div>
@@ -56,19 +53,15 @@
             <div id="r-icon" style="font-size: 40px; margin-bottom: 10px;"></div>
             <h2 id="r-title" style="margin:0"></h2>
             
-            <h3>Exact Measurements</h3>
-            <ul id="r-ingredients" style="line-height: 1.8;"></ul>
-            
-            <h3>How to Cook</h3>
-            <div id="r-steps"></div>
+            <h3 style="margin-top: 25px;">Exact Measurements</h3>
+            <ul id="r-ingredients" style="line-height: 2.2; font-size: 16px; font-weight: 500;"></ul>
             
             <div class="image-container">
-                <div class="loading-text" id="loadingMsg">Preparing AI Visualization...</div>
-                <img id="r-plate" class="plated-photo" src="" onload="document.getElementById('loadingMsg').style.display='none'">
+                <img id="r-plate" class="plated-photo" src="" alt="Recipe Visual">
             </div>
 
-            <button class="btn-action" onclick="alert('Added!')">+ Add Ingredients to Shop</button>
-            <button onclick="closeRecipe()" style="width:100%; padding:15px; background:none; border:none; color:#64748b;">Close</button>
+            <button class="btn-action" onclick="alert('Ingredients Added!')">+ Add to Shopping List</button>
+            <button onclick="closeRecipe()" style="width:100%; padding:15px; background:none; border:none; color:#64748b; font-weight: 600;">Close</button>
         </div>
     </div>
 
@@ -81,13 +74,15 @@
 <script>
     const styles = ["Garlic", "Lemon", "Warm", "Crispy", "Roasted"];
     const proteins = [
-        { name: "Chicken Breast", icon: "🍗", qty: "6oz" },
-        { name: "Omelette Eggs", icon: "🍳", qty: "3 Large Eggs" }
+        { name: "Chicken Breast", icon: "🍗", query: "grilled,chicken,breast" },
+        { name: "Omelette Eggs", icon: "🍳", query: "omelette,eggs" },
+        { name: "Poached Eggs", icon: "🍳", query: "poached,eggs" }
     ];
     const vegetables = [
-        { name: "Spinach", qty: "3 cups", step: "Sauté in oil for 60s." },
-        { name: "Broccoli", qty: "2 cups", step: "Steam for 4 mins." },
-        { name: "Zucchini", qty: "2 cups", step: "Flash fry for 2 mins." }
+        { name: "Spinach", query: "spinach,salad" },
+        { name: "Broccoli", query: "broccoli,steamed" },
+        { name: "Zucchini", query: "zucchini,noodles" },
+        { name: "Kale", query: "kale,salad" }
     ];
 
     let allRecipes = [];
@@ -95,15 +90,13 @@
     function generate() {
         let id = 0;
         styles.forEach(s => proteins.forEach(p => vegetables.forEach(v => {
-            // Updated Prompt Logic for better reliability
-            const photoPrompt = `gourmet-keto-${s.toLowerCase()}-${p.name.split(' ')[0].toLowerCase()}-on-${v.name.toLowerCase()}`;
             allRecipes.push({
                 id: id++,
                 title: `${s} ${p.name} over ${v.name}`,
                 icon: p.icon,
-                imgUrl: `https://loremflickr.com/600/600/cooked,${p.name.split(' ')[0].toLowerCase()},${v.name.toLowerCase()}/all`,
-                ing: [`${p.qty} ${p.name}`, `${v.qty} ${v.name}`, "2 tbsp Olive Oil", "Pink Salt"],
-                steps: [`Prep ${p.name}.`, `Cook thoroughly.`, `${v.step}`, `Drizzle with oil.`]
+                // Using Unsplash source for much higher quality, relevant food photos
+                imgUrl: `https://source.unsplash.com/800x800/?cooked,${p.query},${v.query}`,
+                ing: ["6oz Chicken or 3 Eggs", `${v.name} (2-3 cups)`, "2 tbsp Olive Oil", "Pink Himalayan Salt"]
             });
         })));
         renderRecipes(allRecipes);
@@ -122,17 +115,16 @@
         document.getElementById('r-title').innerText = r.title;
         document.getElementById('r-icon').innerText = r.icon;
         document.getElementById('r-ingredients').innerHTML = r.ing.map(i => `<li>${i}</li>`).join('');
-        document.getElementById('r-steps').innerHTML = r.steps.map(s => `<div class="instruction-step">${s}</div>`).join('');
         
-        // Load the new image
         const img = document.getElementById('r-plate');
-        document.getElementById('loadingMsg').style.display = 'block';
+        // Setting a high-quality food image based on the specific meal
         img.src = r.imgUrl;
         
         document.getElementById('recipeOverlay').style.display = 'flex';
     }
 
     function closeRecipe() { document.getElementById('recipeOverlay').style.display = 'none'; }
+    
     function filterRecipes() {
         const term = document.getElementById('searchInput').value.toLowerCase();
         renderRecipes(allRecipes.filter(r => r.title.toLowerCase().includes(term)));
