@@ -1,106 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PokerWizard | Complete</title>
-    <style>
-        :root { --bg: #0b1120; --card: #1e293b; --primary: #3b82f6; --pink: #f472b6; --sky: #0ea5e9; --gold: #eab308; --win: #22c55e; }
-        body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); color: white; margin: 0; padding-bottom: 90px; -webkit-tap-highlight-color: transparent; }
-        
-        /* Nav */
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 80px; background: #111827; display: flex; border-top: 1px solid #374151; z-index: 1000; }
-        .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; opacity: 0.5; cursor: pointer; }
-        .nav-btn.active { opacity: 1; color: var(--primary); }
-        .nav-icon { font-size: 24px; margin-bottom: 4px; }
-
-        .view { display: none; padding: 20px; animation: slideUp 0.3s ease-out; }
-        .view.active { display: block; }
-        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-        /* Progress Bars */
-        .progress-container { background: #334155; height: 8px; border-radius: 10px; margin: 10px 0; overflow: hidden; }
-        .progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 1s ease-in-out; }
-
-        /* Trainer Table */
-        .table { width: 100%; height: 260px; background: radial-gradient(circle, #1e40af 0%, #1e3a8a 100%); border: 12px solid #334155; border-radius: 130px; margin: 20px 0; position: relative; }
-        .seat { position: absolute; background: white; color: black; padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 800; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        
-        /* Action Buttons with % */
-        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .act-btn { border: none; border-radius: 14px; padding: 12px; cursor: pointer; position: relative; overflow: hidden; height: 60px; }
-        .act-btn span { position: relative; z-index: 2; font-weight: bold; }
-        .percent-label { display: block; font-size: 10px; opacity: 0.8; }
-        .btn-fold { background: #475569; }
-        .btn-call { background: var(--primary); }
-        .btn-raise { background: var(--pink); }
-        .btn-allin { background: var(--gold); }
-
-        /* Range Grid */
-        .grid { display: grid; grid-template-columns: repeat(13, 1fr); gap: 1px; background: #374151; padding: 4px; border-radius: 8px; }
-        .c { aspect-ratio: 1; font-size: 6px; display: flex; align-items: center; justify-content: center; background: #1f2937; font-weight: bold; border-radius: 1px; }
-
-        /* Chips/Filters */
-        .chip-row { display: flex; gap: 8px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; }
-        .chip { background: #1f2937; border: 1px solid #374151; padding: 6px 16px; border-radius: 20px; font-size: 12px; white-space: nowrap; }
-        .chip.active { background: var(--primary); border-color: white; }
-    </style>
-</head>
-<body>
-
-    <div id="v-study" class="view active">
-        <h2 style="margin-bottom:0">Learn Position</h2>
-        <p style="color:#94a3b8; font-size:14px; margin-top:5px">Select a spot to study</p>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px;">
-            <div class="stat-card" style="background:#1e293b; padding:15px; border-radius:15px">
-                <div style="display:flex; justify-content:space-between"><b>LJ</b> <small>🏆 5</small></div>
-                <div class="progress-container"><div class="progress-fill" style="width:72%"></div></div>
-            </div>
-            <div class="stat-card" style="background:#1e293b; padding:15px; border-radius:15px">
-                <div style="display:flex; justify-content:space-between"><b>BTN</b> <small>🏆 6</small></div>
-                <div class="progress-container"><div class="progress-fill" style="width:45%"></div></div>
-            </div>
-        </div>
-        <div style="margin-top:30px; background:white; color:black; border-radius:20px 20px 0 0; padding:20px; margin-left:-20px; margin-right:-20px">
-            <b style="font-size:18px">Three Bet - SB</b>
-            <div id="studyGrid" class="grid" style="margin-top:15px"></div>
-        </div>
-    </div>
-
-    <div id="v-trainer" class="view">
-        <div style="display:flex; justify-content:space-between; align-items:center">
-            <span style="font-size:12px; font-weight:bold">5 / 20</span>
-            <div class="progress-container" style="width:60%; margin:0"><div class="progress-fill" style="width:25%"></div></div>
-        </div>
-        <div class="table">
-            <div class="seat" style="top:10px; left:50%; transform:translateX(-50%)">SB: 49.5 BB</div>
-            <div class="seat" style="right:-10px; top:110px">BB: 49 BB</div>
-            <div class="seat" style="bottom:-10px; left:50%; transform:translateX(-50%); border:3px solid var(--primary)">LJ: 50 BB</div>
-            <div id="hand" style="position:absolute; bottom:25px; left:50%; transform:translateX(-50%); display:flex; gap:8px">
-                <div style="background:white; color:black; padding:8px; border-radius:6px; font-weight:900; width:30px; text-align:center">Q<br><span style="color:red">♦</span></div>
-                <div style="background:white; color:black; padding:8px; border-radius:6px; font-weight:900; width:30px; text-align:center">T<br><span style="color:red">♦</span></div>
-            </div>
-        </div>
-        <div id="feedback" style="text-align:center; height:30px; margin-bottom:10px; font-weight:bold">Analyze the spot...</div>
-        <div class="action-grid">
-            <button class="act-btn btn-fold" onclick="play('FOLD')"><span>FOLD</span><span class="percent-label">0%</span></button>
-            <button class="act-btn btn-call" onclick="play('CALL')"><span>CALL</span><span class="percent-label">73%</span></button>
-            <button class="act-btn btn-raise" onclick="play('RAISE')"><span>RAISE</span><span class="percent-label">27%</span></button>
-            <button class="act-btn btn-allin" onclick="play('ALLIN')"><span>ALL IN</span><span class="percent-label">0%</span></button>
-        </div>
-    </div>
-
-    <div id="v-charts" class="view">
-        <h2>Preflop Charts</h2>
-        <div class="chip-row">
-            <div class="chip active">Cash</div><div class="chip">Tournament</div>
-        </div>
-        <div class="chip-row">
-            <div class="chip active">6 Max</div><div class="chip">9 Max</div>
-        </div>
-        <div id="chartGrid" class="grid" style="margin-top:10px"></div>
-    </div>
-
+<
     <div id="v-progress" class="view">
         <h2>Session Results</h2>
         <div style="background:var(--card); padding:20px; border-radius:20px; margin-top:20px">
@@ -135,16 +35,7 @@
     function makeGrid(target) {
         const g = document.getElementById(target);
         for(let i=0; i<13; i++) {
-            for(let j=0; j<13; j++) {
-                const cell = document.createElement('div');
-                cell.className = 'c';
-                const hand = (i<j) ? ranks[i]+ranks[j]+'s' : (i>j) ? ranks[j]+ranks[i]+'o' : ranks[i]+ranks[j];
-                cell.innerText = hand;
-                if(i < 3 && j < 3) cell.style.background = 'var(--pink)';
-                else if (i > 9 || j > 9) cell.style.background = 'var(--primary)';
-                g.appendChild(cell);
-            }
-        }
+            for(let j=0; j< }
     }
     makeGrid('studyGrid');
     makeGrid('chartGrid');
