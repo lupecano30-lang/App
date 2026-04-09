@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CalmSpace | Your Grounding Tool</title>
+    <style>
+        :root {
+            --bg-color: #f0f4f8;
+            --primary-blue: #a3c4f3;
+            --text-color: #2d3436;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            max-width: 500px;
+            width: 100%;
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+        /* Breathing Circle Animation */
+        .circle-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            margin: 20px 0;
+        }
+        .circle {
+            background-color: var(--primary-blue);
+            height: 100px;
+            width: 100px;
+            border-radius: 50%;
+            transition: all 4s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        .expand { transform: scale(2); }
+        
+        button {
+            background-color: var(--primary-blue);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 30px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .safety-box {
+            margin-top: 30px;
+            font-size: 12px;
+            color: #636e72;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>CalmSpace</h1>
+    <p>Let's take a moment to breathe.</p>
+
+    <div class="circle-container">
+        <div id="breathCircle" class="circle">Breathe</div>
+    </div>
+    
+    <p id="breathText">Press start to begin</p>
+    <button onclick="startBreathing()">Start Exercise</button>
+
+    <div class="safety-box">
+        <strong>Important:</strong> This is a support tool, not medical advice. <br>
+        If you are in crisis, please call <strong>988</strong> (in the US) or your local emergency services.
+    </div>
+</div>
+
+<script>
+    const circle = document.getElementById('breathCircle');
+    const text = document.getElementById('breathText');
+    let running = false;
+
+    function startBreathing() {
+        if(running) return;
+        running = true;
+        cycle();
+    }
+
+    function cycle() {
+        text.innerText = "Breathe In...";
+        circle.classList.add('expand');
+        
+        setTimeout(() => {
+            text.innerText = "Hold...";
+            setTimeout(() => {
+                text.innerText = "Breathe Out...";
+                circle.classList.remove('expand');
+                setTimeout(cycle, 4000);
+            }, 2000);
+        }, 4000);
+    }
+</script>
+
+</body>
+</html>
