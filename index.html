@@ -3,133 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Preflop Pro | GTO Ranges</title>
+    <title>PokerWizard | GTO Trainer</title>
     <style>
-        :root {
-            --bg: #1a1a1a;
-            --card-bg: #2d2d2d;
-            --raise: #eb4d4b;
-            --fold: #636e72;
-            --text: #ffffff;
-        }
-        body {
-            font-family: -apple-system, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 0;
-            padding: 20px;
-        }
-        .controls {
-            margin-bottom: 20px;
-            display: flex;
-            gap: 10px;
-        }
-        select {
-            padding: 10px;
-            background: var(--card-bg);
-            color: white;
-            border: 1px solid #444;
-            border-radius: 8px;
-        }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(13, 1fr);
-            gap: 2px;
-            width: 95vw;
-            max-width: 600px;
-            aspect-ratio: 1;
-        }
-        .cell {
-            background: var(--fold);
-            aspect-ratio: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            font-weight: bold;
-            border-radius: 2px;
-            cursor: default;
-        }
-        .cell.raise { background: var(--raise); }
-        .cell.pair { border: 1px solid rgba(255,255,255,0.3); }
+        :root { --bg: #0f172a; --card: #1e293b; --primary: #3b82f6; --win: #22c55e; --lose: #ef4444; }
+        body { font-family: sans-serif; background: var(--bg); color: white; margin: 0; display: flex; justify-content: center; }
+        .app { width: 100%; max-width: 400px; height: 100vh; display: flex; flex-direction: column; padding: 20px; box-sizing: border-box; }
         
-        .legend {
-            margin-top: 20px;
-            display: flex;
-            gap: 20px;
+        /* Poker Table UI */
+        .table-area {
+            position: relative; width: 100%; height: 300px;
+            background: #1e3a8a; border: 10px solid #334155;
+            border-radius: 150px; margin: 40px 0;
+            display: flex; align-items: center; justify-content: center;
         }
-        .legend-item { display: flex; align-items: center; gap: 5px; font-size: 14px; }
-        .color-box { width: 15px; height: 15px; border-radius: 3px; }
+        .player-seat {
+            position: absolute; background: white; color: black;
+            padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold;
+        }
+        .hero-hand {
+            position: absolute; bottom: -20px; display: flex; gap: 5px;
+        }
+        .poker-card {
+            width: 45px; height: 65px; background: white; border-radius: 5px;
+            color: black; display: flex; flex-direction: column; align-items: center;
+            justify-content: center; font-weight: bold; border: 1px solid #ccc;
+        }
+        .suit-red { color: #ef4444; }
+
+        /* Action Buttons */
+        .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: auto; padding-bottom: 20px; }
+        .btn { border: none; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 16px; }
+        .btn-fold { background: #64748b; color: white; }
+        .btn-call { background: #3b82f6; color: white; }
+        .btn-raise { background: #ec4899; color: white; }
+        .btn-allin { background: #f59e0b; color: white; }
+
+        .score-bar { background: #334155; height: 10px; border-radius: 5px; margin-bottom: 20px; overflow: hidden; }
+        #progress { background: var(--primary); width: 25%; height: 100%; transition: 0.3s; }
+        
+        .feedback { text-align: center; font-size: 18px; font-weight: bold; min-height: 25px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
-    <h2>Preflop Wizard Lite</h2>
-    
-    <div class="controls">
-        <label>Position: </label>
-        <select id="positionSelect" onchange="updateRange()">
-            <option value="UTG">UTG (Under the Gun)</option>
-            <option value="BTN">BTN (Button)</option>
-            <option value="SB">SB (Small Blind)</option>
-        </select>
+<div class="app">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span>Session: <strong id="score">0</strong></span>
+        <div style="width: 60%;">
+            <div class="score-bar"><div id="progress"></div></div>
+        </div>
     </div>
 
-    <div class="grid" id="pokerGrid"></div>
-
-    <div class="legend">
-        <div class="legend-item"><div class="color-box" style="background:var(--raise)"></div> Raise (RFI)</div>
-        <div class="legend-item"><div class="color-box" style="background:var(--fold)"></div> Fold</div>
+    <div class="table-area">
+        <div class="player-seat" style="top: 10px;">SB: 50BB</div>
+        <div class="player-seat" style="right: -10px; top: 100px;">BB: 49BB</div>
+        <div class="player-seat" style="bottom: 10px; left: 50%; transform: translateX(-50%); border: 3px solid var(--primary);">
+            YOU (LJ): 50BB
+        </div>
+        
+        <div class="hero-hand" id="displayHand">
+            </div>
     </div>
+
+    <div class="feedback" id="feedback">Analyze the hand...</div>
+
+    <div class="actions">
+        <button class="btn btn-fold" onclick="checkMove('FOLD')">FOLD</button>
+        <button class="btn btn-call" onclick="checkMove('CALL')">CALL</button>
+        <button class="btn btn-raise" onclick="checkMove('RAISE')">RAISE</button>
+        <button class="btn btn-allin" onclick="checkMove('RAISE')">ALL IN</button>
+    </div>
+</div>
 
 <script>
-    const ranks = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'];
-    const grid = document.getElementById('pokerGrid');
+    let score = 0;
+    let currentHand = {};
+    const deck = ['A', 'K', 'Q', 'J', 'T', '9', '8'];
+    const suits = [{s: '♦', c: 'suit-red'}, {s: '♥', c: 'suit-red'}, {s: '♠', c: ''}, {s: '♣', c: ''}];
 
-    // Simplified GTO Opening Ranges (Raise First In)
-    const ranges = {
-        UTG: ['AA', 'KK', 'QQ', 'JJ', 'TT', '99', '88', '77', 'AKs', 'AQs', 'AJs', 'ATs', 'AKo', 'AQo', 'KQs'],
-        BTN: ['AA', 'KK', 'QQ', 'JJ', 'TT', '99', '88', '77', '66', '55', '44', '33', '22', 'AKs', 'AQs', 'AJs', 'ATs', 'A9s', 'A8s', 'A7s', 'A5s', 'KQs', 'KJs', 'KTs', 'K9s', 'QJs', 'QTs', 'JTs', 'T9s', '98s', 'AKo', 'AQo', 'AJo', 'ATo', 'KQo', 'KJo'],
-        SB: ['AA', 'KK', 'QQ', 'JJ', 'TT', '99', '88', '77', '66', '55', 'AKs', 'AQs', 'AJs', 'ATs', 'A2s', 'KQs', 'AKo', 'AQo']
-    };
+    function dealNewHand() {
+        const r1 = deck[Math.floor(Math.random() * deck.length)];
+        const r2 = deck[Math.floor(Math.random() * deck.length)];
+        const s1 = suits[Math.floor(Math.random() * suits.length)];
+        const s2 = suits[Math.floor(Math.random() * suits.length)];
+        
+        currentHand = { r1, r2, isPair: r1 === r2, isHigh: (r1 === 'A' || r1 === 'K') };
+        
+        document.getElementById('displayHand').innerHTML = `
+            <div class="poker-card ${s1.c}"><div>${r1}</div><div>${s1.s}</div></div>
+            <div class="poker-card ${s2.c}"><div>${r2}</div><div>${s2.s}</div></div>
+        `;
+        document.getElementById('feedback').innerText = "Your turn...";
+        document.getElementById('feedback').style.color = "white";
+    }
 
-    function drawGrid() {
-        grid.innerHTML = '';
-        const currentPos = document.getElementById('positionSelect').value;
-        const currentRange = ranges[currentPos];
+    function checkMove(move) {
+        const feedback = document.getElementById('feedback');
+        // Simple GTO logic: Raise pairs and AK/AQ, Fold the rest (for LJ position)
+        const shouldRaise = currentHand.isPair || currentHand.isHigh;
+        const correct = (shouldRaise && move === 'RAISE') || (!shouldRaise && move === 'FOLD');
 
-        for (let i = 0; i < 13; i++) {
-            for (let j = 0; j < 13; j++) {
-                const cell = document.createElement('div');
-                cell.className = 'cell';
-                
-                let hand = '';
-                if (i < j) {
-                    hand = ranks[i] + ranks[j] + 's'; // Suited
-                } else if (i > j) {
-                    hand = ranks[j] + ranks[i] + 'o'; // Offsuit
-                } else {
-                    hand = ranks[i] + ranks[j]; // Pairs
-                    cell.classList.add('pair');
-                }
-
-                cell.innerText = hand;
-                if (currentRange.includes(hand)) {
-                    cell.classList.add('raise');
-                }
-                grid.appendChild(cell);
-            }
+        if (correct) {
+            score++;
+            feedback.innerText = "CORRECT +1";
+            feedback.style.color = "var(--win)";
+        } else {
+            feedback.innerText = "MISTAKE! GTO says " + (shouldRaise ? "RAISE" : "FOLD");
+            feedback.style.color = "var(--lose)";
         }
+        
+        document.getElementById('score').innerText = score;
+        document.getElementById('progress').style.width = (score * 10) + "%";
+        setTimeout(dealNewHand, 1500);
     }
 
-    function updateRange() {
-        drawGrid();
-    }
-
-    drawGrid();
+    dealNewHand();
 </script>
+
 </body>
 </html>
